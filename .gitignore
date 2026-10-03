@@ -1,0 +1,30 @@
+# build output
+build/
+build-cmake/
+*.o
+*.obj
+*.a
+*.lib
+
+# CMake artefacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+CMakeUserPresets.json
+
+# executables
+*.exe
+*.out
+*.dSYM/
+
+# sanitizer / debugger artefacts
+*.pdb
+*.ilk
+vgcore.*
+
+# editors
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and run unit tests
+        run: make test CC=${{ matrix.cc }}
+
+      - name: Build the CLI
+        run: make all CC=${{ matrix.cc }}
+
+      - name: Smoke-test the CLI
+        run: |
+          ./build/ratelimit --capacity 5 --rate 1 --cost 2 --requests 8 --interval 0.5
+          ./build/ratelimit --help
+          if ./build/ratelimit --capacity 0; then
+            echo "expected a non-zero exit status for invalid input" >&2
+            exit 1
+          fi
+
+  sanitizers:
+    name: sanitizers (address + undefined)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the tests under ASan and UBSan
+        run: make asan CC=clang
+
+  valgrind:
+    name: valgrind (memcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
+      - name: Run the tests under valgrind
+        run: make valgrind CC=gcc
+
+  cmake:
+    name: cmake build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build-cmake -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build-cmake --parallel
+
+      - name: Test
+        run: ctest --test-dir build-cmake --output-on-failure
+
+  portable-script:
+    name: scripts/run_tests.sh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the portable driver
+        run: sh scripts/run_tests.sh
