@@ -28,3 +28,9 @@ vgcore.*
 .vscode/
 .idea/
 *.swp
+
+# ---- クレデンシャル（絶対にコミットしない）----
+.env
+.env.*
+!.env.example
+!.env.template
