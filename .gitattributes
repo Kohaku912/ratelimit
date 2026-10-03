@@ -1,0 +1,16 @@
+# Keep line endings stable across platforms.
+# The shell script and the Makefile must be LF, otherwise the shebang and the
+# recipe lines break when CI checks the repo out on Linux.
+* text=auto eol=lf
+
+*.sh       text eol=lf
+Makefile   text eol=lf
+*.c        text eol=lf
+*.h        text eol=lf
+*.yml      text eol=lf
+*.md       text eol=lf
+.gitignore text eol=lf
+
+*.exe   binary
+*.png   binary
+*.jpg   binary
